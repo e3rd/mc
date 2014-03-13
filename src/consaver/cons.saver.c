@@ -11,9 +11,8 @@
 
    Partly rewritten by Jakub Jelinek <jakub@redhat.com>.
 
-   Copyright (C) 1994, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 1994-2014
+   Free Software Foundation, Inc.
 
    This file is part of the Midnight Commander.
 
@@ -67,7 +66,8 @@
 #endif
 #include <fcntl.h>
 #include <termios.h>
-#include <unistd.h>
+
+#include "lib/unixcompat.h"     /* STDERR_FILENO */
 
 #define LINUX_CONS_SAVER_C
 #include "cons.saver.h"
@@ -145,6 +145,7 @@ static void __attribute__ ((noreturn)) die (void)
     unsigned char zero = 0;
     ssize_t ret;
     ret = write (1, &zero, 1);
+    (void) ret;
     exit (3);
 }
 
@@ -163,7 +164,7 @@ main (int argc, char **argv)
     const char *p, *q;
     struct winsize winsz;
 
-    close (2);
+    close (STDERR_FILENO);
 
     if (argc != 2)
         die ();

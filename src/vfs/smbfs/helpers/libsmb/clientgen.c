@@ -5,8 +5,8 @@
 
    Copyright (C) Andrew Tridgell 1994-1998
 
-   Copyright (C) 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 2011-2014
+   Free Software Foundation, Inc.
 
    This file is part of the Midnight Commander.
 
@@ -2924,7 +2924,7 @@ cli_establish_connection (struct cli_state * cli,
 
 
 /****************************************************************************
-check for existance of a dir
+check for existence of a dir
 ****************************************************************************/
 BOOL
 cli_chkpath (struct cli_state * cli, char *path)

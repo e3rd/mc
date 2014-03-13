@@ -2,9 +2,8 @@
    Internal file viewer for the Midnight Commander
    Function for whow info on display
 
-   Copyright (C) 1994, 1995, 1996, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006, 2007, 2009, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 1994-2014
+   Free Software Foundation, Inc.
 
    Written by:
    Miguel de Icaza, 1994, 1995, 1998
@@ -15,7 +14,7 @@
    Pavel Machek, 1998
    Roland Illig <roland.illig@gmx.de>, 2004, 2005
    Slava Zanko <slavazanko@google.com>, 2009
-   Andrew Borodin <aborodin@vmail.ru>, 2009
+   Andrew Borodin <aborodin@vmail.ru>, 2009, 2013
    Ilia Maslakov <il.smind@gmail.com>, 2009, 2010
 
    This file is part of the Midnight Commander.
@@ -52,7 +51,6 @@
 #include "src/keybind-defaults.h"
 
 #include "internal.h"
-#include "mcviewer.h"
 
 /*** global variables ****************************************************************************/
 
@@ -80,7 +78,7 @@ static enum ruler_type
 static void
 mcview_set_buttonbar (mcview_t * view)
 {
-    Dlg_head *h = WIDGET (view)->owner;
+    WDialog *h = WIDGET (view)->owner;
     WButtonBar *b = find_buttonbar (h);
     const global_keymap_t *keymap = view->hex_mode ? viewer_hex_map : viewer_map;
 
@@ -149,13 +147,13 @@ mcview_display_status (mcview_t * view)
 
     if (width > 40)
     {
-        char buffer[BUF_TRUNC_LEN + 1];
-
         widget_move (view, top, width - 32);
         if (view->hex_mode)
             tty_printf ("0x%08" PRIxMAX, (uintmax_t) view->hex_cursor);
         else
         {
+            char buffer[BUF_TRUNC_LEN + 1];
+
             size_trunc_len (buffer, BUF_TRUNC_LEN, mcview_get_filesize (view), 0,
                             panels_options.kilobyte_si);
             tty_printf ("%9" PRIuMAX "/%s%s %s", (uintmax_t) view->dpy_end,
@@ -189,7 +187,7 @@ mcview_update (mcview_t * view)
     {
         view->dpy_bbar_dirty = FALSE;
         mcview_set_buttonbar (view);
-        buttonbar_redraw (find_buttonbar (WIDGET (view)->owner));
+        widget_redraw (WIDGET (find_buttonbar (WIDGET (view)->owner)));
     }
 
     if (view->dirty > dirt_limit)
@@ -421,6 +419,8 @@ mcview_percent (mcview_t * view, off_t p)
 
     widget_move (view, top, right - 4);
     tty_printf ("%3d%%", percent);
+    /* avoid cursor wrapping in NCurses-base MC */
+    widget_move (view, top, right - 1);
 }
 
 /* --------------------------------------------------------------------------------------------- */

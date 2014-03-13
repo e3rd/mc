@@ -5,8 +5,8 @@
 
    Copyright (C) Karl Auer 1993-1998
 
-   Copyright (C) 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 2011-2014
+   Free Software Foundation, Inc.
 
    Largely re-written by Andrew Tridgell, September 1994
 
@@ -2343,7 +2343,7 @@ lp_killunused (BOOL (*snumused) (int))
 #endif /* 0 */
 #if 0
 /***************************************************************************
-save the curent values of all global and sDefault parameters into the 
+save the current values of all global and sDefault parameters into the 
 defaults union. This allows swat and testparm to show only the
 changed (ie. non-default) parameters.
 ***************************************************************************/

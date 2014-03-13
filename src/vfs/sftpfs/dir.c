@@ -1,8 +1,8 @@
 /* Virtual File System: SFTP file system.
    The internal functions: dirs
 
-   Copyright (C) 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 2011-2014
+   Free Software Foundation, Inc.
 
    Written by:
    Ilia Maslakov <il.smind@gmail.com>, 2011
@@ -155,7 +155,7 @@ sftpfs_readdir (void *data, GError ** error)
  *
  * @param data  directory data handler
  * @param error pointer to the error handler
- * @return 0 if sucess, negative value otherwise
+ * @return 0 if success, negative value otherwise
  */
 
 int
@@ -178,7 +178,7 @@ sftpfs_closedir (void *data, GError ** error)
  * @param vpath path directory
  * @param mode  mode (see man 2 open)
  * @param error pointer to the error handler
- * @return 0 if sucess, negative value otherwise
+ * @return 0 if success, negative value otherwise
  */
 
 int
@@ -234,7 +234,7 @@ sftpfs_mkdir (const vfs_path_t * vpath, mode_t mode, GError ** error)
  *
  * @param vpath path directory
  * @param error pointer to the error handler
- * @return 0 if sucess, negative value otherwise
+ * @return 0 if success, negative value otherwise
  */
 
 int

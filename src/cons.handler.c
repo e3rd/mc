@@ -1,9 +1,8 @@
 /*
    Client interface for General purpose Linux console save/restore server
 
-   Copyright (C) 1994, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2011
-   The Free Software Foundation, Inc. 
+   Copyright (C) 1994-2014
+   Free Software Foundation, Inc.
 
    This file is part of the Midnight Commander.
 
@@ -39,10 +38,10 @@
 #include <sys/ioctl.h>
 #endif
 #endif
-#include <unistd.h>
 
 #include "lib/global.h"
 
+#include "lib/unixcompat.h"
 #include "lib/tty/tty.h"
 #include "lib/skin.h"           /* tty_set_normal_attrs */
 #include "lib/tty/win.h"
@@ -130,6 +129,7 @@ show_console_contents_linux (int starty, unsigned char begin_line, unsigned char
 
     /* Read the value of the mc_global.tty.console_flag */
     ret = read (pipefd2[0], &message, 1);
+    (void) ret;
 }
 
 /* --------------------------------------------------------------------------------------------- */
@@ -137,8 +137,6 @@ show_console_contents_linux (int starty, unsigned char begin_line, unsigned char
 static void
 handle_console_linux (console_action_t action)
 {
-    char *tty_name;
-    char *mc_conssaver;
     int status;
 
     switch (action)
@@ -179,11 +177,14 @@ handle_console_linux (console_action_t action)
                 status = close (pipefd1[1]);
                 status = close (pipefd2[0]);
                 ret = waitpid (cons_saver_pid, &status, 0);
+                (void) ret;
             }
         }
         else
         {
             /* Child */
+            char *tty_name;
+
             /* Close the extra pipe ends */
             status = close (pipefd1[1]);
             status = close (pipefd2[0]);
@@ -191,21 +192,23 @@ handle_console_linux (console_action_t action)
             /* Bind the pipe 0 to the standard input */
             do
             {
-                if (dup2 (pipefd1[0], 0) == -1)
+                if (dup2 (pipefd1[0], STDIN_FILENO) == -1)
                     break;
                 status = close (pipefd1[0]);
                 /* Bind the pipe 1 to the standard output */
-                if (dup2 (pipefd2[1], 1) == -1)
+                if (dup2 (pipefd2[1], STDOUT_FILENO) == -1)
                     break;
 
                 status = close (pipefd2[1]);
                 /* Bind standard error to /dev/null */
                 status = open ("/dev/null", O_WRONLY);
-                if (dup2 (status, 2) == -1)
+                if (dup2 (status, STDERR_FILENO) == -1)
                     break;
                 status = close (status);
-                if (tty_name)
+                if (tty_name != NULL)
                 {
+                    char *mc_conssaver;
+
                     /* Exec the console save/restore handler */
                     mc_conssaver = mc_build_filename (SAVERDIR, "cons.saver", NULL);
                     execl (mc_conssaver, "cons.saver", tty_name, (char *) NULL);
@@ -215,7 +218,7 @@ handle_console_linux (console_action_t action)
             while (0);
             mc_global.tty.console_flag = '\0';
             status = write (1, &mc_global.tty.console_flag, 1);
-            _exit (3);
+            my_exit (3);
         }                       /* if (cons_saver_pid ...) */
         break;
 
@@ -246,6 +249,7 @@ handle_console_linux (console_action_t action)
             close (pipefd1[1]);
             close (pipefd2[0]);
             ret = waitpid (cons_saver_pid, &status, 0);
+            (void) ret;
             mc_global.tty.console_flag = '\0';
         }
         break;

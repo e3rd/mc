@@ -1,9 +1,8 @@
 /*
    Configure module for the Midnight Commander
 
-   Copyright (C) 1994, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2009, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 1994-2014
+   Free Software Foundation, Inc.
 
    This file is part of the Midnight Commander.
 
@@ -58,29 +57,31 @@ mc_config_new_or_override_file (mc_config_t * mc_config, const gchar * ini_path,
     ssize_t cur_written;
     vfs_path_t *ini_vpath;
 
-    ini_vpath = vfs_path_from_str (ini_path);
     data = g_key_file_to_data (mc_config->handle, &len, NULL);
     if (!exist_file (ini_path))
     {
         ret = g_file_set_contents (ini_path, data, len, error);
         g_free (data);
-        vfs_path_free (ini_vpath);
         return ret;
     }
+
     mc_util_make_backup_if_possible (ini_path, "~");
 
+    ini_vpath = vfs_path_from_str (ini_path);
     fd = mc_open (ini_vpath, O_WRONLY | O_TRUNC, 0);
+    vfs_path_free (ini_vpath);
+
     if (fd == -1)
     {
         g_propagate_error (error, g_error_new (MC_ERROR, 0, "%s", unix_error_string (errno)));
         g_free (data);
-        vfs_path_free (ini_vpath);
         return FALSE;
     }
 
     for (written_data = data, total_written = len;
          (cur_written = mc_write (fd, (const void *) written_data, total_written)) > 0;
-         written_data += cur_written, total_written -= cur_written);
+         written_data += cur_written, total_written -= cur_written)
+        ;
     mc_close (fd);
     g_free (data);
 
@@ -88,12 +89,10 @@ mc_config_new_or_override_file (mc_config_t * mc_config, const gchar * ini_path,
     {
         mc_util_restore_from_backup_if_possible (ini_path, "~");
         g_propagate_error (error, g_error_new (MC_ERROR, 0, "%s", unix_error_string (errno)));
-        vfs_path_free (ini_vpath);
         return FALSE;
     }
 
     mc_util_unlink_backup_if_possible (ini_path, "~");
-    vfs_path_free (ini_vpath);
     return TRUE;
 }
 

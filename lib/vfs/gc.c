@@ -1,8 +1,8 @@
 /*
    Virtual File System garbage collection code
 
-   Copyright (C) 2003, 2004, 2005, 2007, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 2003-2014
+   Free Software Foundation, Inc.
 
    Written by:
    Miguel de Icaza, 1995
@@ -270,16 +270,12 @@ vfs_timeout_handler (void)
 /* --------------------------------------------------------------------------------------------- */
 
 void
-vfs_release_path (const char *dir)
+vfs_release_path (const vfs_path_t * vpath)
 {
-    vfs_path_t *vpath;
     const vfs_path_element_t *path_element;
 
-    vpath = vfs_path_from_str (dir);
     path_element = vfs_path_get_by_index (vpath, -1);
-
     vfs_stamp_create (path_element->class, vfs_getid (vpath));
-    vfs_path_free (vpath);
 }
 
 /* --------------------------------------------------------------------------------------------- */

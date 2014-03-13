@@ -1,8 +1,8 @@
 /* Virtual File System: SFTP file system.
    The internal functions: files
 
-   Copyright (C) 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 2011-2014
+   Free Software Foundation, Inc.
 
    Written by:
    Ilia Maslakov <il.smind@gmail.com>, 2011
@@ -60,12 +60,16 @@ static void
 sftpfs_reopen (vfs_file_handler_t * file_handler, GError ** error)
 {
     sftpfs_file_handler_data_t *file_handler_data;
+    int flags;
+    mode_t mode;
 
     file_handler_data = (sftpfs_file_handler_data_t *) file_handler->data;
+    flags = file_handler_data->flags;
+    mode = file_handler_data->mode;
 
     sftpfs_close_file (file_handler, error);
     if (error == NULL || *error == NULL)
-        sftpfs_open_file (file_handler, file_handler_data->flags, file_handler_data->mode, error);
+        sftpfs_open_file (file_handler, flags, mode, error);
 }
 
 /* --------------------------------------------------------------------------------------------- */
@@ -133,6 +137,7 @@ sftpfs_open_file (vfs_file_handler_t * file_handler, int flags, mode_t mode, GEr
         {
             sftpfs_ssherror_to_gliberror (super_data, libssh_errno, error);
             g_free (name);
+            g_free (file_handler_data);
             return FALSE;
         }
     }
@@ -160,7 +165,7 @@ sftpfs_open_file (vfs_file_handler_t * file_handler, int flags, mode_t mode, GEr
  * @param data  file data handler
  * @param buf   buffer for store stat-info
  * @param error pointer to the error handler
- * @return 0 if sucess, negative value otherwise
+ * @return 0 if success, negative value otherwise
  */
 
 int
@@ -225,7 +230,7 @@ sftpfs_fstat (void *data, struct stat *buf, GError ** error)
  * @param count data size
  * @param error pointer to the error handler
  *
- * @return 0 on sucess, negative value otherwise
+ * @return 0 on success, negative value otherwise
  */
 
 ssize_t
@@ -277,7 +282,7 @@ sftpfs_read_file (vfs_file_handler_t * file_handler, char *buffer, size_t count,
  * @param count        data size
  * @param error        pointer to the error handler
  *
- * @return 0 on sucess, negative value otherwise
+ * @return 0 on success, negative value otherwise
  */
 
 ssize_t
@@ -322,7 +327,7 @@ sftpfs_write_file (vfs_file_handler_t * file_handler, const char *buffer, size_t
  * @param file_handler    file data handler
  * @param error           pointer to the error handler
  *
- * @return 0 on sucess, negative value otherwise
+ * @return 0 on success, negative value otherwise
  */
 
 int
@@ -352,15 +357,13 @@ sftpfs_close_file (vfs_file_handler_t * file_handler, GError ** error)
  * @param whence         method of seek (at begin, at current, at end)
  * @param error          pointer to the error handler
  *
- * @return 0 on sucess, negative value otherwise
+ * @return 0 on success, negative value otherwise
  */
 
 off_t
 sftpfs_lseek (vfs_file_handler_t * file_handler, off_t offset, int whence, GError ** error)
 {
     sftpfs_file_handler_data_t *file_handler_data;
-
-    file_handler_data = (sftpfs_file_handler_data_t *) file_handler->data;
 
     switch (whence)
     {
@@ -390,6 +393,8 @@ sftpfs_lseek (vfs_file_handler_t * file_handler, off_t offset, int whence, GErro
         file_handler->pos = file_handler->ino->st.st_size - offset;
         break;
     }
+
+    file_handler_data = (sftpfs_file_handler_data_t *) file_handler->data;
 
     libssh2_sftp_seek64 (file_handler_data->handle, file_handler->pos);
     file_handler->pos = (off_t) libssh2_sftp_tell64 (file_handler_data->handle);

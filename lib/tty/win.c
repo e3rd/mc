@@ -1,9 +1,8 @@
 /*
    Terminal management xterm and rxvt support
 
-   Copyright (C) 1995, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2007, 2009, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 1995-2014
+   Free Software Foundation, Inc.
 
    Written by:
    Andrew Borodin <aborodin@vmail.ru>, 2009.
@@ -58,7 +57,7 @@ static gboolean rxvt_extensions = FALSE;
 /*** file scope functions ************************************************************************/
 /* --------------------------------------------------------------------------------------------- */
 
-/* my own wierd protocol base 16 - paul */
+/* my own weird protocol base 16 - paul */
 static int
 rxvt_getc (void)
 {
@@ -128,7 +127,7 @@ show_rxvt_contents (int starty, unsigned char y1, unsigned char y2)
     while (anything_ready ())
         tty_lowlevel_getch ();
 
-    /* my own wierd protocol base 26 - paul */
+    /* my own weird protocol base 26 - paul */
     printf (ESC_STR "CL%c%c%c%c\n", (y1 / 26) + 'A', (y1 % 26) + 'A', (y2 / 26) + 'A',
             (y2 % 26) + 'A');
 

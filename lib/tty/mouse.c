@@ -1,9 +1,8 @@
 /*
    Mouse managing
 
-   Copyright (C) 1994, 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006,
-   2007, 2009, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 1994-2014
+   Free Software Foundation, Inc.
 
    Written by:
    Andrew Borodin <aborodin@vmail.ru>, 2009.
@@ -47,7 +46,9 @@
 
 Mouse_Type use_mouse_p = MOUSE_NONE;
 gboolean mouse_enabled = FALSE;
+int mouse_fd = -1;              /* for when gpm_fd changes to < 0 and the old one must be cleared from select_set */
 const char *xmouse_seq;
+const char *xmouse_extended_seq;
 
 /*** file scope macro definitions ****************************************************************/
 
@@ -90,6 +91,7 @@ init_mouse (void)
     case MOUSE_XTERM_NORMAL_TRACKING:
     case MOUSE_XTERM_BUTTON_EVENT_TRACKING:
         define_sequence (MCKEY_MOUSE, xmouse_seq, MCKEY_NOACTION);
+        define_sequence (MCKEY_EXTENDED_MOUSE, xmouse_extended_seq, MCKEY_NOACTION);
         break;
 
     default:
@@ -112,7 +114,6 @@ enable_mouse (void)
 #ifdef HAVE_LIBGPM
     case MOUSE_GPM:
         {
-            int mouse_d;
             Gpm_Connect conn;
 
             conn.eventMask = ~GPM_MOVE;
@@ -120,8 +121,8 @@ enable_mouse (void)
             conn.minMod = 0;
             conn.maxMod = 0;
 
-            mouse_d = Gpm_Open (&conn, 0);
-            if (mouse_d == -1)
+            mouse_fd = Gpm_Open (&conn, 0);
+            if (mouse_fd == -1)
             {
                 use_mouse_p = MOUSE_NONE;
                 return;
@@ -138,8 +139,8 @@ enable_mouse (void)
         /* enable mouse tracking */
         printf (ESC_STR "[?1000h");
 
-        /* enable urxvt extended mouse coordinate reporting */
-        printf (ESC_STR "[?1015h");
+        /* enable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006h");
 
         fflush (stdout);
         mouse_enabled = TRUE;
@@ -152,8 +153,8 @@ enable_mouse (void)
         /* enable mouse tracking */
         printf (ESC_STR "[?1002h");
 
-        /* enable urxvt extended mouse coordinate reporting */
-        printf (ESC_STR "[?1015h");
+        /* enable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006h");
 
         fflush (stdout);
         mouse_enabled = TRUE;
@@ -182,8 +183,8 @@ disable_mouse (void)
         break;
 #endif
     case MOUSE_XTERM_NORMAL_TRACKING:
-        /* disable urxvt extended mouse coordinate reporting */
-        printf (ESC_STR "[?1015l");
+        /* disable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006l");
 
         /* disable mouse tracking */
         printf (ESC_STR "[?1000l");
@@ -194,8 +195,8 @@ disable_mouse (void)
         fflush (stdout);
         break;
     case MOUSE_XTERM_BUTTON_EVENT_TRACKING:
-        /* disable urxvt extended mouse coordinate reporting */
-        printf (ESC_STR "[?1015l");
+        /* disable SGR extended mouse reporting */
+        printf (ESC_STR "[?1006l");
 
         /* disable mouse tracking */
         printf (ESC_STR "[?1002l");

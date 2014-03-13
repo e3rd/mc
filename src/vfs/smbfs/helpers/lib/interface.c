@@ -5,8 +5,8 @@
 
    Copyright (C) Andrew Tridgell 1992-1998
 
-   Copyright (C) 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 2011-2014
+   Free Software Foundation, Inc.
 
    This file is part of the Midnight Commander.
 
@@ -236,7 +236,7 @@ interpret_interfaces (char *s, struct interface **interfaces, const char *descri
 
     if (iface->bcast.s_addr != MKBCADDR (iface->ip.s_addr, iface->nmask.s_addr))
     {
-        DEBUG (2, ("Warning: inconsistant interface %s\n", inet_ntoa (iface->ip)));
+        DEBUG (2, ("Warning: inconsistent interface %s\n", inet_ntoa (iface->ip)));
     }
 
     iface->next = NULL;

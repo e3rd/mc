@@ -1,8 +1,8 @@
 /*
    Compare strings while treating digits characters numerically.
 
-   Copyright (C) 1997, 2002, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 1997-2014
+   Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
    Contributed by Jean-Fran�ois Bignolles <bignolle ecoledoc ibp fr>, 1997.
@@ -54,6 +54,7 @@ str_verscmp (const char *s1, const char *s2)
 {
 #ifdef HAVE_STRVERSCMP
     return strverscmp (s1, s2);
+
 #else /* HAVE_STRVERSCMP */
     unsigned char *p1 = (unsigned char *) s1;
     unsigned char *p2 = (unsigned char *) s2;

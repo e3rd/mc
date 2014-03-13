@@ -1,8 +1,8 @@
 /*
    Global structure for some library-related variables
 
-   Copyright (C) 2009, 2011
-   The Free Software Foundation, Inc.
+   Copyright (C) 2009-2014
+   Free Software Foundation, Inc.
 
    Written by:
    Slava Zanko <slavazanko@gmail.com>, 2009.
@@ -93,6 +93,8 @@ mc_global_t mc_global = {
 #ifdef ENABLE_SUBSHELL
         .subshell_pty = 0,
 #endif /* !ENABLE_SUBSHELL */
+
+        .shell = NULL,
 
         .xterm_flag = FALSE,
         .disable_x11 = FALSE,
