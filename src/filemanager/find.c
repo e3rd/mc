@@ -515,7 +515,7 @@ find_parameters (char **start_dir, ssize_t * start_dir_len,
     /* file name */
     const char *file_name_label = N_("File name:");
     const char *file_recurs_label = N_("&Find recursively");
-/*<<<<<<< HEAD*/
+/*<<<<<<< HEAD*/  
     const char *file_skip_hidden_label = N_("S&kip hidden");
     const char *file_only_directories_label = N_("Only &directories");
 //=======
